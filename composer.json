@@ -1,0 +1,36 @@
+{
+    "name": "tasmidur/kafka-monolog-handler",
+    "description": "Kafka Log Handler for laravel and lumen",
+    "keywords": [
+        "kafka",
+        "logger",
+        "laravel",
+        "lumen",
+        "laravel log",
+        "message broker",
+        "kafka broker",
+        "broker"
+    ],
+    "homepage": "https://github.com/hhxsv5/laravel-kafka-logger",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Md Tasmidur Rahman",
+            "email": "tasmidurrahman@example.com",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "illuminate/config": "^8.0|^9.0",
+        "illuminate/support": "^8.0|^9.0",
+        "mateusjunges/laravel-kafka": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tasmidur\\KafkaLogger\\": "src/"
+        }
+    }
+}
