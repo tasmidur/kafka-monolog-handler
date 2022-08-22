@@ -1,6 +1,6 @@
 {
     "name": "tasmidur/kafka-monolog-handler",
-    "description": "Kafka Log Handler for laravel and lumen",
+    "description": "Kafka Monolog Handler is used for storing laravel log into the Kafka message broker that's why any consumer like ELK or any other log manager can consume in an asynchronous way",
     "keywords": [
         "kafka",
         "logger",
@@ -19,6 +19,7 @@
         {
             "name": "Md Tasmidur Rahman",
             "email": "tasmidurrahman@example.com",
+            "homepage": "https://tasmidur.netlify.app/",
             "role": "developer"
         }
     ],

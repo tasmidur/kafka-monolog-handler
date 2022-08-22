@@ -1,135 +1,69 @@
-# Laravel Coupons
+# Kafka Monolog Handler
 
-This package can associate coupons with your Eloquent models. This might come in handy, if you need to associate voucher codes with content that is stored in your Eloquent models.
+Kafka Monolog Handler is used for storing laravel log into the Kafka message broker that's why any consumer like ELK or any other log manager can consume in an asynchronous way
 
-## Installation
+## Requirements
 
-You can install the package via composer:
+| Dependency                                             | Requirement |
+|--------------------------------------------------------|-------------|
+| [php](https://github.com/arnaud-lb/php-rdkafka) | `>=8.0`     |
+| [Laravel](https://github.com/arnaud-lb/php-rdkafka)    | `>=8.0`     |
+This package also requires the rdkafka php extension, which you can install by following [this documentation](https://github.com/edenhill/librdkafka#installation)
 
-```bash
+## Install
+
+Install `kafka-monolog-handler`.
+```shell
 composer require tasmidur/kafka-monolog-handler
 ```
 
-The package will automatically register itself.
+## Get Started
 
-You can publish the migration with:
-
-```bash
-php artisan vendor:publish --provider="Tasmidur\Coupon\LaravelCouponServiceProvider" --tag="coupon-migrations"
-```
-
-After the migration has been published you can create the coupons table by running the migrations:
-
-```bash
-php artisan migrate
-```
-
-You can publish the config-file with:
-
-```bash
-php artisan vendor:publish --provider=Tasmidur\Coupon\LaravelCouponServiceProvider --tag="config"
-```
-
-This is the contents of the published config file:
-
+1.Modify `config/logging.php`.
+### Without Kafka SASL Config
 ```php
-<?php
-
 return [
-
-    /*
-     * Table that will be used for migration
-     */
-    'table' => 'coupons',
-
-    /*
-     * Model to use
-     */
-    'model' => \Tasmidur\Coupon\Models\Coupon::class,
-
-    /*
-     * Pivot table name for coupons and other table relation
-     */
-    'relation_table' => 'coupon_applied',
-
-    /*
-    * Pivot table model name for coupons and other table relation
-    */
-
-    'relation_model_class' => \App\Models\Course::class,
-    /*
-     * List of characters that will be used for Coupons code generation.
-     */
-    'characters' => '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-
-    /*
-     * Coupons code prefix.
-     *
-     * Example: course2022
-     * Generated Code: course2022-37JH-1PUY
-     */
-    'prefix' => null,
-
-    /*
-     * Coupons code suffix.
-     *
-     * Example: course2022
-     * Generated Code: 37JH-1PUY-course2022
-     */
-    'suffix' => null,
-
-    /*
-     * Separator to be used between prefix, code and suffix.
-     */
-    'separator' => '-',
-
-    'coupon_format'=>'*****-*****'
-
-
+    'channels' => [
+        // ...
+       'kafka' => \Tasmidur\KafkaLogger\KafkaLogger::getInstance(
+            topicName: env('KAFKA_LOG_FILE_TOPIC', 'system_logs'),
+            brokers: env('KAFKA_BROKERS')
+        ),
+    ],
 ];
 ```
-## Usage
-
-The basic concept of this package is that you can create coupons, that are associated with a specific model. For example, you could have an application that sells online video courses and a voucher would give a user access to one specific video course.
-
-## Creating coupons
-
-### Using the facade
-
-You can create one or multiple coupons and access by using the `coupons` facade:
-* @method static array createCoupon(string $couponType, float $price, Carbon|null $expiredAt = null, int $totalAmount = 1)
-* @method static mixed getCouponList(string $sortBy = "id", string $orderBy = "ASC")
-* @method static mixed getCouponListWithPagination(int $length = 10, string $sortBy = "id", string $orderBy = "ASC")
-* @method static bool deleteCoupon(int $id)
-* @method static mixed getCoupon(int $id)
-* @method static mixed updateCoupon(array $payload, int $id)
-* @method static mixed check(string $code)
-* @method static mixed whereApplyCoupon(string $code)
+### With Kafka SASL Config
 ```php
-//Use for Create
-$coupon = Coupons::createCoupon(string $couponType, float $price, Carbon|null $expiredAt = null, int $totalAmount = 1);
-//Use for get Coupon List
-$coupon = Coupons::getCouponList(string $sortBy = "id", string $orderBy = "ASC");
-$coupon = Coupons::getCouponListWithPagination(int $length = 10, string $sortBy = "id", string $orderBy = "ASC");
-$coupon = Coupons::deleteCoupon(int $id);
-$coupon = Coupons::getCoupon(int $id);
-//Use for update Coupon List
-$coupon = Coupons::updateCoupon(array $payload, int $id);
-//Use for validity check of Coupon
-$coupon = Coupons::check(string $code);
-//return list of applied coupon where it applied
-$coupon = Coupons::whereApplyCoupon(string $code);
+return [
+    'channels' => [
+        // ...
+       'kafka' => \Tasmidur\KafkaLogger\KafkaLogger::getInstance(
+            topicName: env('KAFKA_LOG_FILE_TOPIC', 'system_logs'),
+            brokers: env('KAFKA_BROKERS'),
+            options: [
+                'sasl_config' => [
+                    'username' => env('KAFKA_BROKER_USERNAME'),
+                    'password' => env('KAFKA_BROKER_PASSWORD'),
+                    'mechanisms' => env('KAFKA_BROKER_MECHANISMS'),
+                    'security_protocol' => env('KAFKA_BROKER_SECURITY_PROTOCOL')
+                ]
+            ]
+        ),
+    ],
+];
+```
+2.Modify `.env`.
+```
+LOG_CHANNEL=kafka
+KAFKA_BROKERS=kafka:9092,kafka:9093
+KAFKA_LOG_FILE_TOPIC=laravel-logs
 
+KAFKA_BROKER_USERNAME=username
+KAFKA_BROKER_PASSWORD=password
+KAFKA_BROKER_MECHANISMS=SCRAM-SHA-512 or other
+KAFKA_BROKER_SECURITY_PROTOCOL=SASL_SSL or other
 ```
 
-Add the `Tasmidur\Coupon\Traits\CouponTrait` trait to your model. This way you can easily apply coupon codes and the package takes care of storing the coupon association in the database.
-```php
- $course = Course::findOrFail($courseId);
- /** One Coupon Is for One Course */
- $course->applyUniqueCoupon($couponCode);
- /** all applied coupons that is associated with course */
- $coupons = Course::eloquentQuery($sortBy, $orderBy, $searchValue)->with(['category', 'coupons'])->get();
-```
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+[MIT](LICENSE)
