@@ -8,6 +8,8 @@ Kafka Monolog Handler is used for storing laravel log into the Kafka message bro
 |--------------------------------------------------------|-------------|
 | [php](https://github.com/arnaud-lb/php-rdkafka) | `>=8.0`     |
 | [Laravel](https://github.com/arnaud-lb/php-rdkafka)    | `>=8.0`     |
+
+
 This package also requires the rdkafka php extension, which you can install by following [this documentation](https://github.com/edenhill/librdkafka#installation)
 
 ## Install
