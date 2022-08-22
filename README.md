@@ -7,7 +7,7 @@ This package can associate coupons with your Eloquent models. This might come in
 You can install the package via composer:
 
 ```bash
-composer require tasmidur/coupon
+composer require tasmidur/kafka-monolog-handler
 ```
 
 The package will automatically register itself.
