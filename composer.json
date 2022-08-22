@@ -1,6 +1,6 @@
 {
     "name": "tasmidur/kafka-monolog-handler",
-    "description": "Kafka Monolog Handler is used for storing laravel log into the Kafka message broker that's why any consumer like ELK or any other log manager can consume in an asynchronous way",
+    "description": "Kafka Monolog Handler is used for pushing laravel log into the Kafka message broker",
     "keywords": [
         "kafka",
         "logger",
