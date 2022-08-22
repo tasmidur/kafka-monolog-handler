@@ -1,6 +1,6 @@
 <?php
 
-namespace Tasmidur\KafkaLogger;
+namespace Tasmidur\KafkaMonologHandler;
 
 use Junges\Kafka\Config\Sasl;
 use Junges\Kafka\Facades\Kafka;

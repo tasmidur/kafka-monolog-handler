@@ -1,6 +1,6 @@
 <?php
 
-namespace Tasmidur\KafkaLogger;
+namespace Tasmidur\KafkaMonologHandler;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +22,7 @@ class KafkaLogger
      * @param string|null $clientName
      * @return array
      */
-    public static function getDefinition(string $topicName, string $brokers, array $options = [], string $clientName = null): array
+    public static function getInstance(string $topicName, string $brokers, array $options = [], string $clientName = null): array
     {
         $default = [
             'driver' => 'custom',

@@ -11,7 +11,7 @@
         "kafka broker",
         "broker"
     ],
-    "homepage": "https://github.com/hhxsv5/laravel-kafka-logger",
+    "homepage": "https://github.com/tasmidur/kafka-monolog-handler",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "license": "MIT",
@@ -30,7 +30,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Tasmidur\\KafkaLogger\\": "src/"
+            "Tasmidur\\KafkaMonologHandler\\": "src/"
         }
     }
 }
