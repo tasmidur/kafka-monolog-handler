@@ -4,9 +4,11 @@ namespace Tasmidur\KafkaMonologHandler;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Throwable;
+use function Widmogrod\Functional\curryN;
 
 class KafkaLogger
 {
@@ -18,19 +20,23 @@ class KafkaLogger
      * Get the logging definition of Kafka channel
      * @param string $topicName
      * @param string $brokers
+     * @param string|null $key
+     * @param NormalizerFormatter|null $formatter
      * @param array $options
      * @param string|null $clientName
      * @return array
      */
-    public static function getInstance(string $topicName, string $brokers, array $options = [], string $clientName = null): array
+    public static function getInstance(string $topicName, string $brokers, string $key = null, NormalizerFormatter $formatter = null, array $options = [], string $clientName = null): array
     {
         $default = [
             'driver' => 'custom',
             'via' => static::class,
             'topic' => $topicName,
+            'key' => $key,
             'brokers' => $brokers,
             'client_name' => $clientName ?? config('app.name'),
             'fallback' => 'daily',
+            'formatter' => $formatter
         ];
         return array_merge($default, $options);
     }
@@ -40,7 +46,6 @@ class KafkaLogger
      */
     public function __invoke(array $config): Logger
     {
-        Log::debug("config", $config);
         $logger = new Logger('kafka');
         throw_if(empty($config['brokers']), new \Exception('Brokers is provided', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
         if (!empty($config['sasl_config'])) {
@@ -51,7 +56,9 @@ class KafkaLogger
         }
         $topic = $config['topic'];
         $brokers = $config['brokers'];
-        $handler = new KafkaLogHandler(topic: $topic, brokers: $brokers, config: $config);
+        $key = $config['key'] ?? null;
+        $formatter = $config['formatter'] ?? null;
+        $handler = new KafkaLogHandler(topic: $topic, key: $key, brokers: $brokers, config: $config);
         $logger->pushHandler($handler);
         return $logger;
     }

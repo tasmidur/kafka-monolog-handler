@@ -2,15 +2,19 @@
 
 namespace Tasmidur\KafkaMonologHandler;
 
+use Illuminate\Support\Facades\Log;
 use Junges\Kafka\Config\Sasl;
 use Junges\Kafka\Facades\Kafka;
 use Junges\Kafka\Message\Message;
+use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Handler\Handler;
 use Monolog\Logger;
+use const Widmogrod\Monad\Writer\log;
 
 
 /**
- *
+ * class KafkaLogHandler
  */
 class KafkaLogHandler extends AbstractProcessingHandler
 {
@@ -23,26 +27,39 @@ class KafkaLogHandler extends AbstractProcessingHandler
      */
     private string $fallback;
 
+    /**
+     * @var string
+     */
     private string $brokers;
 
+    /**
+     * @var string
+     */
     private string $topic;
+
+    /**
+     * @var string
+     */
+    private string $key;
 
 
     /**
      * @param string $topic
+     * @param string $key
      * @param string $brokers
      * @param array $config
      * @param string $fallback
      * @param int $level
      * @param bool $bubble
      */
-    public function __construct(string $topic, string $brokers, array $config, string $fallback = 'daily', int $level = Logger::DEBUG, bool $bubble = true)
+    public function __construct(string $topic, string $key, string $brokers, array $config, string $fallback = 'daily', int $level = Logger::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
         $this->config = $config;
         $this->fallback = $fallback;
         $this->topic = $topic;
         $this->brokers = $brokers;
+        $this->key = $key;
     }
 
     /**
@@ -51,9 +68,12 @@ class KafkaLogHandler extends AbstractProcessingHandler
      */
     protected function write(array $record): void
     {
-        $data = (string)$record['formatted'];
-        try {
+        if (!empty($this->config['formatter'])) {
+            $elasticSearchLogFomater = $this->config['formatter'];
+            $record = $elasticSearchLogFomater->format($record);
+        }
 
+        try {
             $kafka = Kafka::publishOn(
                 topic: $this->topic,
                 broker: $this->brokers
@@ -66,9 +86,12 @@ class KafkaLogHandler extends AbstractProcessingHandler
                     securityProtocol: $this->config['sasl_config']['security_protocol'] ?? 'SASL_SSL'
                 ));
             }
+
+            if (!empty($this->key)) {
+                $kafka->withKafkaKey($this->key);
+            }
             $message = new Message(
-                body: $data,
-                key: $this->config['client_name']
+                body: $record
             );
 
             $kafka->withConfigOptions(
