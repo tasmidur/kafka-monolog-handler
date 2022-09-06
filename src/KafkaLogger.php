@@ -25,19 +25,17 @@ class KafkaLogger
      * @param string|null $clientName
      * @return array
      */
-    public static function getInstance(string $topicName, string $brokers, string $key = null, NormalizerFormatter $formatter = null): array
+    public static function getInstance(string $topicName, string $brokers, array $options = []): array
     {
         $default = [
             'driver' => 'custom',
             'via' => static::class,
             'topic' => $topicName,
-            'key' => $key,
             'brokers' => $brokers,
             'client_name' => config('app.name'),
-            'fallback' => 'daily',
-            'formatter' => $formatter
+            'fallback' => 'daily'
         ];
-        return $default;
+        return array_merge($default, $options);
     }
 
     /**
@@ -45,7 +43,6 @@ class KafkaLogger
      */
     public function __invoke(array $config): Logger
     {
-
         $logger = new Logger('kafka');
         throw_if(empty($config['brokers']), new \Exception('Brokers is provided', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
         if (!empty($config['sasl_config'])) {
@@ -56,8 +53,7 @@ class KafkaLogger
         }
         $topic = $config['topic'];
         $brokers = $config['brokers'];
-        $key = $config['key'] ?? null;
-        $formatter = $config['formatter'] ?? null;
+        $key = $config['key'] ?? config('app.name');
         $handler = new KafkaLogHandler(topic: $topic, key: $key, brokers: $brokers, config: $config);
         $logger->pushHandler($handler);
         return $logger;
