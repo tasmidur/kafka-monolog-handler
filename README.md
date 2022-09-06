@@ -27,14 +27,14 @@ composer require tasmidur/kafka-monolog-handler
 return [
     'channels' => [
         // ...
-       'kafka' => \Tasmidur\KafkaLogger\KafkaLogger::getInstance(
-            topicName: env('KAFKA_LOG_FILE_TOPIC', 'system_logs'),
-            brokers: env('KAFKA_BROKERS')
+       'kafka' => \Tasmidur\KafkaMonologHandler\KafkaLogger::getInstance(
+            topicName: env('KAFKA_LOG_FILE_TOPIC', 'laravel_logs'),
+            brokers: env('KAFKA_LOG_BROKERS')
         ),
     ],
 ];
 ```
-### With Kafka SASL Config
+### With Kafka SASL Config and Log Formatter like ElasticsearchFormatter
 ```php
 return [
     'channels' => [
@@ -48,7 +48,10 @@ return [
                     'password' => env('KAFKA_BROKER_PASSWORD'),
                     'mechanisms' => env('KAFKA_BROKER_MECHANISMS'),
                     'security_protocol' => env('KAFKA_BROKER_SECURITY_PROTOCOL')
-                ]
+                ],
+                'formatter' => new ElasticsearchFormatter(
+                    index: env('KAFKA_LOG_FILE_TOPIC', 'laravel_logs'),
+                    type: "_doc")
             ]
         ),
     ],
