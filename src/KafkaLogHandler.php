@@ -10,6 +10,7 @@ use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\Handler;
 use Monolog\Logger;
+use const Widmogrod\Monad\IO\throwIO;
 use const Widmogrod\Monad\Writer\log;
 
 
@@ -48,6 +49,7 @@ class KafkaLogHandler extends AbstractProcessingHandler
      * @param string $key
      * @param string $brokers
      * @param array $config
+     * @param NormalizerFormatter $formatter
      * @param string $fallback
      * @param int $level
      * @param bool $bubble
@@ -71,6 +73,16 @@ class KafkaLogHandler extends AbstractProcessingHandler
         if (!empty($this->config['formatter'])) {
             $elasticSearchLogFomater = $this->config['formatter'];
             $record = $elasticSearchLogFomater->format($record);
+        }
+
+        $record['topic_name'] = $record['_index'] ?? $this->topic;
+
+        /** ES index and type override avoid the collision*/
+        if (array_key_exists("_index", $record)) {
+            unset($record['_index']);
+        }
+        if (array_key_exists("_type", $record)) {
+            unset($record['_type']);
         }
 
         try {
@@ -103,7 +115,7 @@ class KafkaLogHandler extends AbstractProcessingHandler
             $kafka->send();
         } catch (\Throwable $e) {
             $method = strtolower($record['level_name']);
-            app('log')->channel($this->fallback)->$method(sprintf('%s (%s fallback: %s)', $data, $record['channel'], $e->getMessage()));
+            app('log')->channel($this->fallback)->$method(sprintf('%s (%s fallback: %s)', $record['formatted'], $record['channel'], $e->getMessage()));
         }
 
     }
