@@ -14,7 +14,7 @@ This package also requires the rdkafka php extension, which you can install by f
 
 ## Install
 
-Install `kafka-monolog-handler`.
+Install [kafka-monolog-handler](https://packagist.org/packages/tasmidur/kafka-monolog-handler).
 ```shell
 composer require tasmidur/kafka-monolog-handler
 ```
