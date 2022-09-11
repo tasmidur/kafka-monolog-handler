@@ -43,6 +43,7 @@ return [
             topicName: env('KAFKA_LOG_FILE_TOPIC', 'system_logs'),
             brokers: env('KAFKA_BROKERS'),
             options: [
+                'is_sasl_apply' => env('IS_SASL'), //true = applied or false= not apply
                 'sasl_config' => [
                     'username' => env('KAFKA_BROKER_USERNAME'),
                     'password' => env('KAFKA_BROKER_PASSWORD'),
