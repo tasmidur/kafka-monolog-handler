@@ -45,7 +45,8 @@ class KafkaLogger
     {
         $logger = new Logger('kafka');
         throw_if(empty($config['brokers']), new \Exception('Brokers is provided', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
-        if (!empty($config['sasl_config'])) {
+        throw_if($config['is_sasl_apply'] && empty($config['sasl_config']), new \Exception('SASL Configuration is required', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
+        if ($config['is_sasl_apply'] && !empty($config['sasl_config'])) {
             throw_if(empty($config['sasl_config']['username']), new \Exception('Username is invalid', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
             throw_if(empty($config['sasl_config']['password']), new \Exception('Password is invalid', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
             throw_if(empty($config['sasl_config']['mechanisms']), new \Exception('Auth Mechanisms is invalid', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
