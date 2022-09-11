@@ -90,7 +90,7 @@ class KafkaLogHandler extends AbstractProcessingHandler
                 topic: $this->topic,
                 broker: $this->brokers
             );
-            if (!empty($this->config['sasl_config'])) {
+            if ($this->config['is_sasl_apply'] && !empty($this->config['sasl_config'])) {
                 $kafka->withSasl(new Sasl(
                     username: $this->config['sasl_config']['username'],
                     password: $this->config['sasl_config']['password'],

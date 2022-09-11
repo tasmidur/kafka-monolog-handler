@@ -43,6 +43,7 @@ class KafkaLogger
      */
     public function __invoke(array $config): Logger
     {
+
         $logger = new Logger('kafka');
         throw_if(empty($config['brokers']), new \Exception('Brokers is provided', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
         throw_if($config['is_sasl_apply'] && empty($config['sasl_config']), new \Exception('SASL Configuration is required', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
@@ -52,6 +53,7 @@ class KafkaLogger
             throw_if(empty($config['sasl_config']['mechanisms']), new \Exception('Auth Mechanisms is invalid', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
             throw_if(empty($config['sasl_config']['security_protocol']), new \Exception('SecurityProtocol is invalid', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY));
         }
+
         $topic = $config['topic'];
         $brokers = $config['brokers'];
         $key = $config['key'] ?? config('app.name');
