@@ -43,7 +43,7 @@ return [
             topicName: env('KAFKA_LOG_FILE_TOPIC', 'system_logs'),
             brokers: env('KAFKA_BROKERS'),
             options: [
-                'is_sasl_apply' => env('IS_SASL'), //true = applied or false= not apply
+                'is_sasl_apply' => env('IS_SASL_APPLY'), //true = applied or false= not apply
                 'sasl_config' => [
                     'username' => env('KAFKA_BROKER_USERNAME'),
                     'password' => env('KAFKA_BROKER_PASSWORD'),
@@ -64,6 +64,7 @@ LOG_CHANNEL=kafka
 KAFKA_BROKERS=kafka:9092,kafka:9093
 KAFKA_LOG_FILE_TOPIC=laravel-logs
 
+IS_SASL_APPLY=false
 KAFKA_BROKER_USERNAME=username
 KAFKA_BROKER_PASSWORD=password
 KAFKA_BROKER_MECHANISMS=SCRAM-SHA-512
