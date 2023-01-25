@@ -1,6 +1,8 @@
 # Kafka Monolog Handler
 
-Kafka Monolog Handler is used for storing laravel log into the Kafka message broker that's why any consumer like ELK or any other log manager can consume in an asynchronous way
+The "kafka-monolog-handler" package is a package for Laravel framework. This package allows you to send your Laravel application's log messages to a Kafka server using Monolog, a popular logging library for PHP.
+
+The package provides a handler for Monolog that sends log messages to a Kafka topic. The package also includes a config file, where you can specify the host and port of your Kafka server, as well as the topic to which the log messages should be sent
 
 ## Requirements
 
